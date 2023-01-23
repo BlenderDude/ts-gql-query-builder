@@ -1,39 +1,59 @@
-import { GQLScalar, GQLSchema, GQLType } from "./types";
+import {
+  Conform,
+  ObjectTypeDefinition,
+  ScalarTypeDefinition,
+  SchemaDefinition,
+} from "./schema_types";
 
-type Scalars = {
-  ID: GQLScalar<"ID", string>;
-  String: GQLScalar<"String", string>;
-  Float: GQLScalar<"Float", number>;
-  Int: GQLScalar<"Int", number>;
-};
-
-export type Post = GQLType<
-  "Post",
+type ID = Conform<
+  ScalarTypeDefinition,
   {
-    id: { scalar: Scalars["ID"] };
-    image: { scalar: Scalars["String"]; isNullable: true };
+    name: "ID";
+    output: string;
+    input: string;
   }
 >;
 
-export type User = GQLType<
-  "User",
+type String = Conform<
+  ScalarTypeDefinition,
   {
-    id: { scalar: Scalars["ID"] };
-    name: { scalar: Scalars["String"] };
-    posts: { type: Post; isList: true };
+    name: "String";
+    output: string;
+    input: string;
   }
 >;
 
-export type Query = GQLType<
-  "Query",
+type User = Conform<
+  ObjectTypeDefinition,
   {
-    user: {
-      type: User;
-      args: {
-        id: Scalars["ID"];
+    name: "User";
+    fields: {
+      id: {
+        type: ID;
+      };
+      name: {
+        type: String;
       };
     };
   }
 >;
 
-export type Schema = GQLSchema<Query, never, never>;
+export type Query = Conform<
+  ObjectTypeDefinition,
+  {
+    name: "Query";
+    fields: {
+      user: {
+        args: {
+          id: { type: String };
+        };
+        type: User | null;
+      };
+      users: {
+        type: User[];
+      };
+    };
+  }
+>;
+
+export type Schema = SchemaDefinition<Query>;

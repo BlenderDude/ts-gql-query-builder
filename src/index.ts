@@ -1,18 +1,44 @@
 import { Schema } from "./schema";
-import { makeTSGQL, ResultFromOperation } from "./types";
+import { SchemaDefinition } from "./schema_types";
+import {
+  DocumentBuilder,
+  ObjectBuilder,
+  ResultFromOperation,
+} from "./builder_types";
+import { parse, print, validate } from "graphql";
 
-const tsgql = makeTSGQL<Schema>();
+function makeTSGQL<
+  OperationType extends "query" | "mutation",
+  Schema extends SchemaDefinition<any>
+>(): () => DocumentBuilder<{}, Schema[OperationType]> {
+  return () => {
+    return new DocumentBuilder();
+  };
+}
 
-const query = tsgql("Test", "Query", (q) => [
-  q.user({}, (q) => [
+const tsgql = makeTSGQL<"query", Schema>();
+
+const query = tsgql().addQuery("test", (q) =>
+  q.fields((q) => [
     //
-    q.id(),
-    q.name(),
-    q.posts({}, (q) => [
+    q
+      .user(($) => ({
+        id: "test",
+      }))
+      .fields((q) => [
+        //
+        q.id(),
+        q.name().alias("nameAlias"),
+      ]),
+    q.users().fields((q) => [
       //
-      q.id({ alias: "test" }),
+      q.id(),
+      q.name(),
     ]),
-  ]),
-]);
+  ])
+);
 
-type Result = ResultFromOperation<typeof query>;
+console.log(JSON.stringify(query.build(), null, 2));
+console.log(print(query.build()));
+
+type Res = ResultFromOperation<typeof query>;

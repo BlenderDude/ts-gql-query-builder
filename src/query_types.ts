@@ -1,9 +1,9 @@
-import { Query } from "./new_schema";
+import { Query } from "./schema";
 import {
   ObjectTypeDefinition,
   TypeDefinition,
   UnionTypeDefinition,
-} from "./new_schema_types";
+} from "./schema_types";
 
 type OperationType = "query" | "mutation" | "subscription";
 
